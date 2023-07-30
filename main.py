@@ -37,14 +37,12 @@ root = Tk()
 icon = ImageTk.PhotoImage(Image.open("./Assets/icon.png"))
 root.title("Intellogo")
 root.iconphoto(False, icon)
-root.geometry("500x500")
+root.geometry("500x600")
+
 
 # DISPLAY
 button = Button(root, text='Choose File', command=upload_file)
-button.pack()
-
-# canvas = Canvas(root, width = 500, height = 500)  
-# canvas.pack() 
+button.pack() 
 
 image = Label(root, width = 500, height = 500)
 image.pack()

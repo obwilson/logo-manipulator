@@ -9,12 +9,36 @@ def upload_file():
     filename = filedialog.askopenfilename()
 
     if filename.endswith((".png", ".jpg", ".jpeg")):
-        print('Selected:', filename)
+        print("Selected:", filename)
         # Create copy of file for use until program termination
         shutil.copyfile(filename, "./Temporary/original.png")
+        original = Image.open(filename)
+        resized = original.resize((500, 500))
+        resized.save("./Temporary/resized.png")
+
+        balance()
     else:
-        print('Invalid file')
+        print("Invalid file")
         del(filename)
+
+def balance():
+    file = Image.open("./Temporary/resized.png")
+    overlay = Image.open("./Assets/balance_overlay.png")
+    file.paste(overlay, (0, 0), overlay)
+    file.save("./Temporary/balanced.png")
+
+    # balance = Label(balance_tab, width=500, height=500)
+    # balance.image = file
+    # balance.pack()
+
+def colourblind():
+    pass
+
+def pixelate():
+    pass
+
+def blur():
+    pass
 
 def on_exit():
     shutil.rmtree("Temporary/")
@@ -23,52 +47,58 @@ def on_exit():
 def main_loop():
     ## MAIN PROGRAM LOOP
 
-    path = "./Temporary/original.png"
+    path = "./Temporary/resized.png"
 
     loaded_img = Image.open(path) if os.path.exists(path) else None
-    img = ImageTk.PhotoImage(loaded_img) if os.path.exists(path) else icon
-    image.image = img
+    img = ImageTk.PhotoImage(loaded_img) if os.path.exists(path) else default
+    file_image.image = img
 
-    image.configure(image=img)
+    file_image.configure(image=img)
 
     root.after(1, main_loop)
 
 # INITIALISATION
 root = Tk()
 icon = ImageTk.PhotoImage(Image.open("./Assets/icon.png"))
+default = ImageTk.PhotoImage(Image.open("./Assets/open_file.png"))
 root.title("Intellogo")
 root.iconphoto(False, icon)
 root.geometry("500x600")
 
-# Tabs
+# TABS SETUP
 tabs = ttk.Notebook(root)
 tabs.pack(pady=15)
 
-scale_tab = Frame(tabs, width=500, height=500, bg="Blue")
-colourblind_tab = Frame(tabs, width=500, height=500, bg="Red")
-blur_tab = Frame(tabs, width=500, height=500, bg="Blue")
-pixel_tab = Frame(tabs, width=500, height=500, bg="Red")
-bw_tab = Frame(tabs, width=500, height=500, bg="Blue")
+original_tab = Frame(tabs, width=500, height=500)
+balance_tab = Frame(tabs, width=500, height=500)
+scale_tab = Frame(tabs, width=500, height=500)
+colourblind_tab = Frame(tabs, width=500, height=500)
+blur_tab = Frame(tabs, width=500, height=500)
+pixel_tab = Frame(tabs, width=500, height=500)
+bw_tab = Frame(tabs, width=500, height=500)
 
+original_tab.pack(fill="both", expand=1)
+balance_tab.pack(fill="both", expand=1)
 scale_tab.pack(fill="both", expand=1)
 colourblind_tab.pack(fill="both", expand=1)
 blur_tab.pack(fill="both", expand=1)
 pixel_tab.pack(fill="both", expand=1)
 bw_tab.pack(fill="both", expand=1)
 
+tabs.add(original_tab, text="Original")
+tabs.add(balance_tab, text="Balance")
 tabs.add(scale_tab, text="Scaled")
 tabs.add(colourblind_tab, text="Colourblind")
 tabs.add(blur_tab, text="Blurred")
 tabs.add(pixel_tab, text="Pixelated")
 tabs.add(bw_tab, text="Black/White")
 
-
 # DISPLAY
-button = Button(root, text='Choose File', command=upload_file)
+button = Button(root, text="Choose File", command=upload_file)
 button.pack() 
 
-image = Label(scale_tab, width = 500, height = 500)
-image.pack()
+file_image = Label(original_tab, width=500, height=500)
+file_image.pack()
 
 root.after(1, main_loop)
 root.mainloop()

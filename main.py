@@ -1,8 +1,8 @@
 from tkinter import *
 from tkinter import ttk
-from PIL import ImageTk,Image 
+from PIL import ImageTk,Image,ImageFilter
 from tkinter import filedialog
-from daltonlens import convert, simulate, generate
+from daltonlens import simulate
 import numpy as np
 import shutil, atexit, os
 
@@ -10,6 +10,9 @@ def upload_file():
     ### Prompts file upload and then checks if valid
     filename = filedialog.askopenfilename()
 
+    make_files(filename)
+    
+def make_files(filename):
     if filename.endswith((".png", ".jpg", ".jpeg")):
         print("Selected:", filename)
         # Create copy of file for use until program termination
@@ -27,9 +30,12 @@ def upload_file():
 
         balance()
         colourblind()
+        blur()
+        pixelate()
     else:
         print("Invalid file")
         del(filename)
+
 
 def balance():
     file = Image.open("./Temporary/resized.png")
@@ -53,11 +59,16 @@ def colourblind():
     tritan.save("./Temporary/tritan.png")
 
 
-def pixelate():
-    pass
-
 def blur():
-    pass
+    file = Image.open("./Temporary/resized.png")
+    blurred = file.filter(ImageFilter. GaussianBlur(radius=20))
+    blurred.save("./Temporary/blurred.png")
+
+def pixelate():
+    file = Image.open("./Temporary/resized.png")
+    downsized = file.resize((32, 32), resample=Image.Resampling.BILINEAR)
+    pixelated = downsized.resize(file.size, Image.Resampling.NEAREST)
+    pixelated.save("./Temporary/pixelated.png")
 
 def on_exit():
     shutil.rmtree("Temporary/")
@@ -66,63 +77,66 @@ def on_exit():
 def main_loop():
     ### MAIN PROGRAM LOOP
 
-    PATH = "./Temporary/resized.png"
-    BALANCE_PATH = "./Temporary/balanced.png"
-    SCALE_1_PATH = "./Temporary/scale_1.png"
-    SCALE_2_PATH = "./Temporary/scale_2.png"
-    SCALE_3_PATH = "./Temporary/scale_3.png"
-    PROTAN_PATH = "./Temporary/protan.png"
-    DEUTAN_PATH = "./Temporary/deutan.png"
-    TRITAN_PATH = "./Temporary/tritan.png"
-
     # ORIGINAL TAB
-    loaded_img = Image.open(PATH) if os.path.exists(PATH) else None
-    img = ImageTk.PhotoImage(loaded_img) if os.path.exists(PATH) else OPEN
+    img = Image.open(PATH) if os.path.exists(PATH) else None
+    img = ImageTk.PhotoImage(img) if os.path.exists(PATH) else OPEN
     file_image.image = img
     file_image.configure(image=img)
 
     # BALANCE TAB
-    balance_loaded_img = Image.open(BALANCE_PATH) if os.path.exists(BALANCE_PATH) else None
-    balance_img = ImageTk.PhotoImage(balance_loaded_img) if os.path.exists(BALANCE_PATH) else DEFAULT
+    balance_img = Image.open(BALANCE_PATH) if os.path.exists(BALANCE_PATH) else None
+    balance_img = ImageTk.PhotoImage(balance_img) if os.path.exists(BALANCE_PATH) else ICON
     balance_image.image = balance_img
     balance_image.configure(image=balance_img)
 
     # SCALE TAB
-    scale_1_loaded_img = Image.open(SCALE_1_PATH) if os.path.exists(SCALE_1_PATH) else None
-    scale_1_img = ImageTk.PhotoImage(scale_1_loaded_img) if os.path.exists(SCALE_1_PATH) else SCALE_1_DEFAULT
+    scale_1_img = Image.open(SCALE_1_PATH) if os.path.exists(SCALE_1_PATH) else None
+    scale_1_img = ImageTk.PhotoImage(scale_1_img) if os.path.exists(SCALE_1_PATH) else ICON
     scale_1_image.image = scale_1_img
     scale_1_image.configure(image=scale_1_img)
 
-    scale_2_loaded_img = Image.open(SCALE_2_PATH) if os.path.exists(SCALE_2_PATH) else None
-    scale_2_img = ImageTk.PhotoImage(scale_2_loaded_img) if os.path.exists(SCALE_2_PATH) else SCALE_2_DEFAULT
+    scale_2_img = Image.open(SCALE_2_PATH) if os.path.exists(SCALE_2_PATH) else None
+    scale_2_img = ImageTk.PhotoImage(scale_2_img) if os.path.exists(SCALE_2_PATH) else ICON
     scale_2_image.image = scale_2_img
     scale_2_image.configure(image=scale_2_img)
 
-    scale_3_loaded_img = Image.open(SCALE_3_PATH) if os.path.exists(SCALE_3_PATH) else None
-    scale_3_img = ImageTk.PhotoImage(scale_3_loaded_img) if os.path.exists(SCALE_3_PATH) else SCALE_3_DEFAULT
+    scale_3_img = Image.open(SCALE_3_PATH) if os.path.exists(SCALE_3_PATH) else None
+    scale_3_img = ImageTk.PhotoImage(scale_3_img) if os.path.exists(SCALE_3_PATH) else ICON
     scale_3_image.image = scale_3_img
     scale_3_image.configure(image=scale_3_img)
 
     # COLOURBLIND TAB
     loaded_original = Image.open(PATH).resize((250, 250)) if os.path.exists(PATH) else None
-    original = ImageTk.PhotoImage(loaded_original) if os.path.exists(PATH) else DEFAULT
+    original = ImageTk.PhotoImage(loaded_original) if os.path.exists(PATH) else ICON
     original_image.image = original
     original_image.configure(image=original)
 
     protan_img = Image.open(PROTAN_PATH) if os.path.exists(PROTAN_PATH) else None
-    protan_img = ImageTk.PhotoImage(protan_img) if os.path.exists(PROTAN_PATH) else DEFAULT
+    protan_img = ImageTk.PhotoImage(protan_img) if os.path.exists(PROTAN_PATH) else ICON
     protan_image.image = protan_img
     protan_image.configure(image=protan_img)
 
     deutan_img = Image.open(DEUTAN_PATH) if os.path.exists(DEUTAN_PATH) else None
-    deutan_img = ImageTk.PhotoImage(deutan_img) if os.path.exists(DEUTAN_PATH) else DEFAULT
+    deutan_img = ImageTk.PhotoImage(deutan_img) if os.path.exists(DEUTAN_PATH) else ICON
     deutan_image.image = deutan_img
     deutan_image.configure(image=deutan_img)
 
     tritan_img = Image.open(TRITAN_PATH) if os.path.exists(TRITAN_PATH) else None
-    tritan_img = ImageTk.PhotoImage(tritan_img) if os.path.exists(TRITAN_PATH) else DEFAULT
+    tritan_img = ImageTk.PhotoImage(tritan_img) if os.path.exists(TRITAN_PATH) else ICON
     tritan_image.image = tritan_img
     tritan_image.configure(image=tritan_img)
+
+    # BLUR TAB
+    blur_img = Image.open(BLUR_PATH) if os.path.exists(BLUR_PATH) else None
+    blur_img = ImageTk.PhotoImage(blur_img) if os.path.exists(BLUR_PATH) else ICON
+    blur_image.image = blur_img
+    blur_image.configure(image=blur_img)
+
+    # PIXELATE TAB
+    pixel_img = Image.open(PIXEL_PATH) if os.path.exists(PIXEL_PATH) else None
+    pixel_img = ImageTk.PhotoImage(pixel_img) if os.path.exists(PIXEL_PATH) else ICON
+    pixel_image.image = pixel_img
+    pixel_image.configure(image=pixel_img)
 
     root.after(1, main_loop)
 
@@ -131,10 +145,18 @@ root = Tk()
 
 ICON = ImageTk.PhotoImage(Image.open("./Assets/icon.png"))
 OPEN = ImageTk.PhotoImage(Image.open("./Assets/open_file.png"))
-DEFAULT = ImageTk.PhotoImage(Image.open("./Assets/default_image.png"))
-SCALE_1_DEFAULT = ImageTk.PhotoImage(Image.open("./Assets/scale_1_default.png"))
-SCALE_2_DEFAULT = ImageTk.PhotoImage(Image.open("./Assets/scale_2_default.png"))
-SCALE_3_DEFAULT = ImageTk.PhotoImage(Image.open("./Assets/scale_3_default.png"))
+PATH = "./Temporary/resized.png"
+BALANCE_PATH = "./Temporary/balanced.png"
+SCALE_1_PATH = "./Temporary/scale_1.png"
+SCALE_2_PATH = "./Temporary/scale_2.png"
+SCALE_3_PATH = "./Temporary/scale_3.png"
+PROTAN_PATH = "./Temporary/protan.png"
+DEUTAN_PATH = "./Temporary/deutan.png"
+TRITAN_PATH = "./Temporary/tritan.png"
+BLUR_PATH = "./Temporary/blurred.png"
+PIXEL_PATH = "./Temporary/pixelated.png"
+
+make_files("./Assets/icon.png")
 
 root.title("Intellogo")
 root.iconphoto(False, ICON)
@@ -202,6 +224,12 @@ deutan_image = Label(deutan_frame, width=250, height=250)
 deutan_image.pack()
 tritan_image = Label(tritan_frame, width=250, height=250)
 tritan_image.pack()
+
+blur_image = Label(blur_tab, width=500, height=500)
+blur_image.pack()
+
+pixel_image = Label(pixel_tab, width=500, height=500)
+pixel_image.pack()
 
 root.after(1, main_loop)
 root.mainloop()

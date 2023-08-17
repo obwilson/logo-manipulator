@@ -14,28 +14,33 @@ def upload_file():
     
 def make_files(filename):
     if filename.endswith((".png", ".jpg", ".jpeg")):
-        
-        print("Selected:", filename)
-        # Create copy of file for use until program termination
-        shutil.copyfile(filename, "./Temporary/original.png")
-        original = Image.open(filename)
-        if original.mode == 'CMYK':
-            original = original.convert('RGB')
-        resized = original.resize((500, 500))
-        resized.save("./Temporary/resized.png")
+        if Image.open(filename).size > (200, 200):
+            print("Selected:", filename)
+            # Create copy of file for use until program termination
+            shutil.copyfile(filename, "./Temporary/original.png")
+            original = Image.open(filename)
+            if original.mode == 'CMYK':
+                original = original.convert('RGB')
+            resized = original.resize((500, 500))
+            resized.save("./Temporary/resized.png")
 
-        scale_1 = original.resize((250, 250))
-        scale_1.save("./Temporary/scale_1.png")
-        scale_2 = original.resize((100, 100))
-        scale_2.save("./Temporary/scale_2.png")
-        scale_3 = original.resize((40, 40))
-        scale_3.save("./Temporary/scale_3.png")
+            scale_1 = original.resize((250, 250))
+            scale_1.save("./Temporary/scale_1.png")
+            scale_2 = original.resize((100, 100))
+            scale_2.save("./Temporary/scale_2.png")
+            scale_3 = original.resize((40, 40))
+            scale_3.save("./Temporary/scale_3.png")
 
-        balance()
-        colourblind()
-        blur()
-        pixelate()
-        black_white()
+            balance()
+            colourblind()
+            blur()
+            pixelate()
+            black_white()
+        else:
+            messagebox.showerror("Intellogo",
+            "Error: Image too small, please use 200x200 pixels or above.")
+            print("Invalid file")
+            del(filename)
     else:
         messagebox.showerror("Intellogo",
         "Error: Invalid filetype, please use .png or .jpg files only.")

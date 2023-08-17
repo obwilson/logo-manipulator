@@ -1,5 +1,5 @@
 from tkinter import *
-from tkinter import ttk
+from tkinter import ttk, messagebox
 from PIL import ImageTk,Image,ImageFilter
 from tkinter import filedialog
 from daltonlens import simulate
@@ -14,10 +14,13 @@ def upload_file():
     
 def make_files(filename):
     if filename.endswith((".png", ".jpg", ".jpeg")):
+        
         print("Selected:", filename)
         # Create copy of file for use until program termination
         shutil.copyfile(filename, "./Temporary/original.png")
         original = Image.open(filename)
+        if original.mode == 'CMYK':
+            original = original.convert('RGB')
         resized = original.resize((500, 500))
         resized.save("./Temporary/resized.png")
 
@@ -32,7 +35,10 @@ def make_files(filename):
         colourblind()
         blur()
         pixelate()
+        black_white()
     else:
+        messagebox.showerror("Intellogo",
+        "Error: Invalid filetype, please use .png or .jpg files only.")
         print("Invalid file")
         del(filename)
 
@@ -44,12 +50,15 @@ def balance():
     file.save("./Temporary/balanced.png")
 
 def colourblind():
-    file = np.asarray(Image.open("./Temporary/resized.png").resize((250, 250)).convert("RGB"))
-    simulator = simulate.Simulator_Brettel1997()
-    protan_img = simulator.simulate_cvd (file, simulate.Deficiency.PROTAN, severity=1)
-    deutan_img = simulator.simulate_cvd (file, simulate.Deficiency.DEUTAN, severity=1)
-    tritan_img = simulator.simulate_cvd (file, simulate.Deficiency.TRITAN, severity=1)
-    
+    file = np.asarray(
+    Image.open("./Temporary/resized.png").resize((250, 250)).convert("RGB")
+    )
+    # file.convert("RGB")
+    sim = simulate.Simulator_Brettel1997()
+    protan_img = sim.simulate_cvd (file, simulate.Deficiency.PROTAN, severity=1)
+    deutan_img = sim.simulate_cvd (file, simulate.Deficiency.DEUTAN, severity=1)
+    tritan_img = sim.simulate_cvd (file, simulate.Deficiency.TRITAN, severity=1)
+
     protan = Image.fromarray(protan_img)
     deutan = Image.fromarray(deutan_img)
     tritan = Image.fromarray(tritan_img)
@@ -70,6 +79,12 @@ def pixelate():
     pixelated = downsized.resize(file.size, Image.Resampling.NEAREST)
     pixelated.save("./Temporary/pixelated.png")
 
+def black_white():
+    file = Image.open("./Temporary/resized.png")
+    grayscale = file.convert("L")
+
+    grayscale.save("./Temporary/grayscale.png")
+
 def on_exit():
     shutil.rmtree("Temporary/")
     os.mkdir("Temporary/")
@@ -78,65 +93,71 @@ def main_loop():
     ### MAIN PROGRAM LOOP
 
     # ORIGINAL TAB
-    img = Image.open(PATH) if os.path.exists(PATH) else None
-    img = ImageTk.PhotoImage(img) if os.path.exists(PATH) else OPEN
+    img = Image.open(PATH)
+    img = ImageTk.PhotoImage(img)
     file_image.image = img
     file_image.configure(image=img)
 
     # BALANCE TAB
-    balance_img = Image.open(BALANCE_PATH) if os.path.exists(BALANCE_PATH) else None
-    balance_img = ImageTk.PhotoImage(balance_img) if os.path.exists(BALANCE_PATH) else ICON
+    balance_img = Image.open(BALANCE_PATH)
+    balance_img = ImageTk.PhotoImage(balance_img)
     balance_image.image = balance_img
     balance_image.configure(image=balance_img)
 
     # SCALE TAB
-    scale_1_img = Image.open(SCALE_1_PATH) if os.path.exists(SCALE_1_PATH) else None
-    scale_1_img = ImageTk.PhotoImage(scale_1_img) if os.path.exists(SCALE_1_PATH) else ICON
+    scale_1_img = Image.open(SCALE_1_PATH)
+    scale_1_img = ImageTk.PhotoImage(scale_1_img)
     scale_1_image.image = scale_1_img
     scale_1_image.configure(image=scale_1_img)
 
-    scale_2_img = Image.open(SCALE_2_PATH) if os.path.exists(SCALE_2_PATH) else None
-    scale_2_img = ImageTk.PhotoImage(scale_2_img) if os.path.exists(SCALE_2_PATH) else ICON
+    scale_2_img = Image.open(SCALE_2_PATH)
+    scale_2_img = ImageTk.PhotoImage(scale_2_img)
     scale_2_image.image = scale_2_img
     scale_2_image.configure(image=scale_2_img)
 
-    scale_3_img = Image.open(SCALE_3_PATH) if os.path.exists(SCALE_3_PATH) else None
-    scale_3_img = ImageTk.PhotoImage(scale_3_img) if os.path.exists(SCALE_3_PATH) else ICON
+    scale_3_img = Image.open(SCALE_3_PATH)
+    scale_3_img = ImageTk.PhotoImage(scale_3_img)
     scale_3_image.image = scale_3_img
     scale_3_image.configure(image=scale_3_img)
 
     # COLOURBLIND TAB
-    loaded_original = Image.open(PATH).resize((250, 250)) if os.path.exists(PATH) else None
-    original = ImageTk.PhotoImage(loaded_original) if os.path.exists(PATH) else ICON
+    loaded_original = Image.open(PATH).resize((250, 250))
+    original = ImageTk.PhotoImage(loaded_original)
     original_image.image = original
     original_image.configure(image=original)
 
-    protan_img = Image.open(PROTAN_PATH) if os.path.exists(PROTAN_PATH) else None
-    protan_img = ImageTk.PhotoImage(protan_img) if os.path.exists(PROTAN_PATH) else ICON
+    protan_img = Image.open(PROTAN_PATH)
+    protan_img = ImageTk.PhotoImage(protan_img)
     protan_image.image = protan_img
     protan_image.configure(image=protan_img)
 
-    deutan_img = Image.open(DEUTAN_PATH) if os.path.exists(DEUTAN_PATH) else None
-    deutan_img = ImageTk.PhotoImage(deutan_img) if os.path.exists(DEUTAN_PATH) else ICON
+    deutan_img = Image.open(DEUTAN_PATH)
+    deutan_img = ImageTk.PhotoImage(deutan_img)
     deutan_image.image = deutan_img
     deutan_image.configure(image=deutan_img)
 
-    tritan_img = Image.open(TRITAN_PATH) if os.path.exists(TRITAN_PATH) else None
-    tritan_img = ImageTk.PhotoImage(tritan_img) if os.path.exists(TRITAN_PATH) else ICON
+    tritan_img = Image.open(TRITAN_PATH)
+    tritan_img = ImageTk.PhotoImage(tritan_img)
     tritan_image.image = tritan_img
     tritan_image.configure(image=tritan_img)
 
     # BLUR TAB
-    blur_img = Image.open(BLUR_PATH) if os.path.exists(BLUR_PATH) else None
-    blur_img = ImageTk.PhotoImage(blur_img) if os.path.exists(BLUR_PATH) else ICON
+    blur_img = Image.open(BLUR_PATH)
+    blur_img = ImageTk.PhotoImage(blur_img)
     blur_image.image = blur_img
     blur_image.configure(image=blur_img)
 
     # PIXELATE TAB
-    pixel_img = Image.open(PIXEL_PATH) if os.path.exists(PIXEL_PATH) else None
-    pixel_img = ImageTk.PhotoImage(pixel_img) if os.path.exists(PIXEL_PATH) else ICON
+    pixel_img = Image.open(PIXEL_PATH)
+    pixel_img = ImageTk.PhotoImage(pixel_img)
     pixel_image.image = pixel_img
     pixel_image.configure(image=pixel_img)
+
+    # BLACK AND WHITE TAB
+    grayscale_img = Image.open(GRAYSCALE_PATH)
+    grayscale_img = ImageTk.PhotoImage(grayscale_img)
+    grayscale_image.image = grayscale_img
+    grayscale_image.configure(image=grayscale_img)
 
     root.after(1, main_loop)
 
@@ -155,6 +176,8 @@ DEUTAN_PATH = "./Temporary/deutan.png"
 TRITAN_PATH = "./Temporary/tritan.png"
 BLUR_PATH = "./Temporary/blurred.png"
 PIXEL_PATH = "./Temporary/pixelated.png"
+SILHOUETTE_PATH = "./Temporary/silhouette.png"
+GRAYSCALE_PATH = "./Temporary/grayscale.png"
 
 make_files("./Assets/icon.png")
 
@@ -230,6 +253,9 @@ blur_image.pack()
 
 pixel_image = Label(pixel_tab, width=500, height=500)
 pixel_image.pack()
+
+grayscale_image = Label(bw_tab, width=500, height=500)
+grayscale_image.pack()
 
 root.after(1, main_loop)
 root.mainloop()

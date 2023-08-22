@@ -7,15 +7,23 @@ import numpy as np
 import shutil, atexit, os
 
 def upload_file():
-    ### Prompts file upload and then checks if valid
+    """
+    Prompts file upload
+    """
+    
     filename = filedialog.askopenfilename()
 
     make_files(filename)
     
 def make_files(filename):
+    """
+    Checks if files are valid, then runs manipulation functions
+    """
+
     if filename.endswith((".png", ".jpg", ".jpeg")):
-        if Image.open(filename).size > (200, 200):
+        if Image.open(filename).size >= (200, 200):
             print("Selected:", filename)
+            root.iconphoto(False, ImageTk.PhotoImage(Image.open(filename)))
             # Create copy of file for use until program termination
             shutil.copyfile(filename, "./Temporary/original.png")
             original = Image.open(filename)
@@ -39,26 +47,41 @@ def make_files(filename):
         else:
             messagebox.showerror("Intellogo",
             "Error: Image too small, please use 200x200 pixels or above.")
+            upload_file()
             print("Invalid file")
             del(filename)
     else:
         messagebox.showerror("Intellogo",
         "Error: Invalid filetype, please use .png or .jpg files only.")
+        upload_file()
         print("Invalid file")
         del(filename)
 
-
 def balance():
+    """
+    Pastes grid onto image to show how balanced the image is
+    """
+
     file = Image.open("./Temporary/resized.png")
     overlay = Image.open("./Assets/balance_overlay.png")
     file.paste(overlay, (0, 0), overlay)
     file.save("./Temporary/balanced.png")
 
 def colourblind():
+    """
+    Converts image to 3 different types of colourblindness
+    """
+
     file = np.asarray(
     Image.open("./Temporary/resized.png").resize((250, 250)).convert("RGB")
     )
-    # file.convert("RGB")
+    original = Image.fromarray(file)
+    original_overlay = Image.open("./Assets/original_overlay.png")
+
+    protan_overlay = Image.open("./Assets/protan_overlay.png")
+    deutan_overlay = Image.open("./Assets/deutan_overlay.png")
+    tritan_overlay = Image.open("./Assets/tritan_overlay.png")
+
     sim = simulate.Simulator_Brettel1997()
     protan_img = sim.simulate_cvd (file, simulate.Deficiency.PROTAN, severity=1)
     deutan_img = sim.simulate_cvd (file, simulate.Deficiency.DEUTAN, severity=1)
@@ -68,34 +91,56 @@ def colourblind():
     deutan = Image.fromarray(deutan_img)
     tritan = Image.fromarray(tritan_img)
 
+    original.paste(original_overlay, (0, 0), original_overlay)
+    protan.paste(protan_overlay, (0, 0), protan_overlay)
+    deutan.paste(deutan_overlay, (0, 0), deutan_overlay)
+    tritan.paste(tritan_overlay, (0, 0), tritan_overlay)
+
+    original.save("./Temporary/original_cb.png")
     protan.save("./Temporary/protan.png")
     deutan.save("./Temporary/deutan.png")
     tritan.save("./Temporary/tritan.png")
 
-
 def blur():
+    """
+    Apply a Gaussian blur to the image
+    """
+
     file = Image.open("./Temporary/resized.png")
     blurred = file.filter(ImageFilter. GaussianBlur(radius=20))
     blurred.save("./Temporary/blurred.png")
 
 def pixelate():
+    """
+    Downscales image then upscales to pixelate it
+    """
+
     file = Image.open("./Temporary/resized.png")
     downsized = file.resize((32, 32), resample=Image.Resampling.BILINEAR)
     pixelated = downsized.resize(file.size, Image.Resampling.NEAREST)
     pixelated.save("./Temporary/pixelated.png")
 
 def black_white():
+    """
+    Converts image to grayscale
+    """
+
     file = Image.open("./Temporary/resized.png")
     grayscale = file.convert("L")
 
     grayscale.save("./Temporary/grayscale.png")
 
 def on_exit():
-    shutil.rmtree("Temporary/")
-    os.mkdir("Temporary/")
+    """
+    Deletes ./Temporary/ contents
+    """
+    shutil.rmtree("./Temporary/")
+    os.mkdir("./Temporary/")
 
 def main_loop():
-    ### MAIN PROGRAM LOOP
+    """
+    Main tkinter loop
+    """
 
     # ORIGINAL TAB
     img = Image.open(PATH)
@@ -126,7 +171,7 @@ def main_loop():
     scale_3_image.configure(image=scale_3_img)
 
     # COLOURBLIND TAB
-    loaded_original = Image.open(PATH).resize((250, 250))
+    loaded_original = Image.open(ORIGINAL_CB_PATH)
     original = ImageTk.PhotoImage(loaded_original)
     original_image.image = original
     original_image.configure(image=original)
@@ -164,6 +209,34 @@ def main_loop():
     grayscale_image.image = grayscale_img
     grayscale_image.configure(image=grayscale_img)
 
+    print(tabs.index("current"))
+    if tabs.index("current") == 0:
+        tips.config(text="""Upload a file to get started. Please use images
+above 200x200 pixels and while not required, a white
+background works better to see the results.""")
+    elif tabs.index("current") == 1:
+        tips.config(text="""The balance of your logo can be important to make
+sure one side doesn't overwhelm the other.""")
+    elif tabs.index("current") == 2:
+        tips.config(text="""It's important for a logo to be recognisable from
+any size. If you can't see important details, the
+logo might need to be simplified more.""")
+    elif tabs.index("current") == 3:
+        tips.config(text="""If colour is an important part of your design,
+it's important to take people with colourblindness into
+account. Do the colours still convey the right message?""")
+    elif tabs.index("current") == 4:
+        tips.config(text="""A blurred image helps you imagine what your logo
+could look like at a quick glance, can people still tell
+what it is?""")
+    elif tabs.index("current") == 5:
+        tips.config(text="""A logo will lose a lot of detail at lower
+resolutions. A good logo should still be recognisable with
+the lost detail.""")
+    else:
+        tips.config(text="""A good logo works with both colour and in black and
+white""")
+
     root.after(1, main_loop)
 
 # INITIALISATION
@@ -176,6 +249,7 @@ BALANCE_PATH = "./Temporary/balanced.png"
 SCALE_1_PATH = "./Temporary/scale_1.png"
 SCALE_2_PATH = "./Temporary/scale_2.png"
 SCALE_3_PATH = "./Temporary/scale_3.png"
+ORIGINAL_CB_PATH = "./Temporary/original_cb.png"
 PROTAN_PATH = "./Temporary/protan.png"
 DEUTAN_PATH = "./Temporary/deutan.png"
 TRITAN_PATH = "./Temporary/tritan.png"
@@ -188,7 +262,7 @@ make_files("./Assets/icon.png")
 
 root.title("Intellogo")
 root.iconphoto(False, ICON)
-root.geometry("500x600")
+root.geometry("500x650")
 
 # TABS SETUP
 tabs = ttk.Notebook(root)
@@ -219,6 +293,9 @@ tabs.add(pixel_tab, text="Pixelated")
 tabs.add(bw_tab, text="Black/White")
 
 # DISPLAY
+tips = Label(root, text="Default tooltip")
+tips.pack()
+
 button = Button(root, text="Choose File", command=upload_file)
 button.pack() 
 

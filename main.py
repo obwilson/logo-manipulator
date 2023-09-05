@@ -7,21 +7,18 @@ import numpy as np
 import shutil, atexit, os
 
 def upload_file():
-    """
-    Prompts file upload
-    """
+    """Prompts file upload"""
     
     filename = filedialog.askopenfilename()
 
     make_files(filename)
     
 def make_files(filename):
-    """
-    Checks if files are valid, then runs manipulation functions
-    """
+    """Checks if files are valid, then runs manipulation functions"""
 
     if filename.endswith((".png", ".jpg", ".jpeg")):
-        if Image.open(filename).size >= (200, 200):
+        if (Image.open(filename).width >= 200 and
+            Image.open(filename).height >= 200):
             print("Selected:", filename)
             root.iconphoto(False, ImageTk.PhotoImage(Image.open(filename)))
             # Create copy of file for use until program termination
@@ -58,9 +55,7 @@ def make_files(filename):
         del(filename)
 
 def balance():
-    """
-    Pastes grid onto image to show how balanced the image is
-    """
+    """Pastes grid onto image to show how balanced the image is"""
 
     file = Image.open("./Temporary/resized.png")
     overlay = Image.open("./Assets/balance_overlay.png")
@@ -68,52 +63,37 @@ def balance():
     file.save("./Temporary/balanced.png")
 
 def colourblind():
-    """
-    Converts image to 3 different types of colourblindness
-    """
+    """Converts image to 3 different types of colourblindness"""
 
     file = np.asarray(
     Image.open("./Temporary/resized.png").resize((250, 250)).convert("RGB")
     )
-    original = Image.fromarray(file)
-    original_overlay = Image.open("./Assets/original_overlay.png")
-
-    protan_overlay = Image.open("./Assets/protan_overlay.png")
-    deutan_overlay = Image.open("./Assets/deutan_overlay.png")
-    tritan_overlay = Image.open("./Assets/tritan_overlay.png")
 
     sim = simulate.Simulator_Brettel1997()
-    protan_img = sim.simulate_cvd (file, simulate.Deficiency.PROTAN, severity=1)
-    deutan_img = sim.simulate_cvd (file, simulate.Deficiency.DEUTAN, severity=1)
-    tritan_img = sim.simulate_cvd (file, simulate.Deficiency.TRITAN, severity=1)
+    protan_img = sim.simulate_cvd (file, simulate.Deficiency.PROTAN,
+                                   severity=1)
+    deutan_img = sim.simulate_cvd (file, simulate.Deficiency.DEUTAN,
+                                   severity=0.8) # Full results weren't accurate
+    tritan_img = sim.simulate_cvd (file, simulate.Deficiency.TRITAN,
+                                   severity=1)
 
     protan = Image.fromarray(protan_img)
     deutan = Image.fromarray(deutan_img)
     tritan = Image.fromarray(tritan_img)
 
-    original.paste(original_overlay, (0, 0), original_overlay)
-    protan.paste(protan_overlay, (0, 0), protan_overlay)
-    deutan.paste(deutan_overlay, (0, 0), deutan_overlay)
-    tritan.paste(tritan_overlay, (0, 0), tritan_overlay)
-
-    original.save("./Temporary/original_cb.png")
     protan.save("./Temporary/protan.png")
     deutan.save("./Temporary/deutan.png")
     tritan.save("./Temporary/tritan.png")
 
 def blur():
-    """
-    Apply a Gaussian blur to the image
-    """
+    """Apply a Gaussian blur to the image"""
 
     file = Image.open("./Temporary/resized.png")
-    blurred = file.filter(ImageFilter. GaussianBlur(radius=20))
+    blurred = file.filter(ImageFilter.GaussianBlur(radius=20))
     blurred.save("./Temporary/blurred.png")
 
 def pixelate():
-    """
-    Downscales image then upscales to pixelate it
-    """
+    """Downscales image then upscales to pixelate it"""
 
     file = Image.open("./Temporary/resized.png")
     downsized = file.resize((32, 32), resample=Image.Resampling.BILINEAR)
@@ -121,9 +101,7 @@ def pixelate():
     pixelated.save("./Temporary/pixelated.png")
 
 def black_white():
-    """
-    Converts image to grayscale
-    """
+    """Converts image to grayscale"""
 
     file = Image.open("./Temporary/resized.png")
     grayscale = file.convert("L")
@@ -131,16 +109,12 @@ def black_white():
     grayscale.save("./Temporary/grayscale.png")
 
 def on_exit():
-    """
-    Deletes ./Temporary/ contents
-    """
+    """Deletes ./Temporary/ contents"""
     shutil.rmtree("./Temporary/")
     os.mkdir("./Temporary/")
 
 def main_loop():
-    """
-    Main tkinter loop
-    """
+    """Main tkinter loop"""
 
     # ORIGINAL TAB
     img = Image.open(PATH)
@@ -171,7 +145,7 @@ def main_loop():
     scale_3_image.configure(image=scale_3_img)
 
     # COLOURBLIND TAB
-    loaded_original = Image.open(ORIGINAL_CB_PATH)
+    loaded_original = Image.open(PATH).resize((250, 250))
     original = ImageTk.PhotoImage(loaded_original)
     original_image.image = original
     original_image.configure(image=original)
@@ -209,7 +183,6 @@ def main_loop():
     grayscale_image.image = grayscale_img
     grayscale_image.configure(image=grayscale_img)
 
-    print(tabs.index("current"))
     if tabs.index("current") == 0:
         tips.config(text="""Upload a file to get started. Please use images
 above 200x200 pixels and while not required, a white
@@ -243,13 +216,11 @@ white""")
 root = Tk()
 
 ICON = ImageTk.PhotoImage(Image.open("./Assets/icon.png"))
-OPEN = ImageTk.PhotoImage(Image.open("./Assets/open_file.png"))
 PATH = "./Temporary/resized.png"
 BALANCE_PATH = "./Temporary/balanced.png"
 SCALE_1_PATH = "./Temporary/scale_1.png"
 SCALE_2_PATH = "./Temporary/scale_2.png"
 SCALE_3_PATH = "./Temporary/scale_3.png"
-ORIGINAL_CB_PATH = "./Temporary/original_cb.png"
 PROTAN_PATH = "./Temporary/protan.png"
 DEUTAN_PATH = "./Temporary/deutan.png"
 TRITAN_PATH = "./Temporary/tritan.png"

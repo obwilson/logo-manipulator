@@ -65,6 +65,11 @@ def balance():
 def colourblind():
     """Converts image to 3 different types of colourblindness"""
 
+    original_overlay = Image.open("./Assets/original_overlay.png")
+    protan_overlay = Image.open("./Assets/protan_overlay.png")
+    deutan_overlay = Image.open("./Assets/deutan_overlay.png")
+    tritan_overlay = Image.open("./Assets/tritan_overlay.png")
+
     file = np.asarray(
     Image.open("./Temporary/resized.png").resize((250, 250)).convert("RGB")
     )
@@ -77,10 +82,17 @@ def colourblind():
     tritan_img = sim.simulate_cvd (file, simulate.Deficiency.TRITAN,
                                    severity=1)
 
+    original_cb = Image.open(PATH).resize((250, 250))
     protan = Image.fromarray(protan_img)
     deutan = Image.fromarray(deutan_img)
     tritan = Image.fromarray(tritan_img)
 
+    original_cb.paste(original_overlay, (0, 0), original_overlay)
+    protan.paste(protan_overlay, (0, 0), protan_overlay)
+    deutan.paste(deutan_overlay, (0, 0), deutan_overlay)
+    tritan.paste(tritan_overlay, (0, 0), tritan_overlay)
+
+    original_cb.save("./Temporary/original_cb.png")
     protan.save("./Temporary/protan.png")
     deutan.save("./Temporary/deutan.png")
     tritan.save("./Temporary/tritan.png")
@@ -145,7 +157,7 @@ def main_loop():
     scale_3_image.configure(image=scale_3_img)
 
     # COLOURBLIND TAB
-    loaded_original = Image.open(PATH).resize((250, 250))
+    loaded_original = Image.open(ORIGINAL_CB_PATH).resize((250, 250))
     original = ImageTk.PhotoImage(loaded_original)
     original_image.image = original
     original_image.configure(image=original)
@@ -221,6 +233,7 @@ BALANCE_PATH = "./Temporary/balanced.png"
 SCALE_1_PATH = "./Temporary/scale_1.png"
 SCALE_2_PATH = "./Temporary/scale_2.png"
 SCALE_3_PATH = "./Temporary/scale_3.png"
+ORIGINAL_CB_PATH = "./Temporary/original_cb.png"
 PROTAN_PATH = "./Temporary/protan.png"
 DEUTAN_PATH = "./Temporary/deutan.png"
 TRITAN_PATH = "./Temporary/tritan.png"

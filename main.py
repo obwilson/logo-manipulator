@@ -117,98 +117,99 @@ def main_loop():
     """Main tkinter loop"""
 
     # ORIGINAL TAB
-    img = Image.open(PATH)
+    img = Image.open(paths[0])
     img = ImageTk.PhotoImage(img)
     file_image.image = img
     file_image.configure(image=img)
 
     # BALANCE TAB
-    balance_img = Image.open(BALANCE_PATH)
+    balance_img = Image.open(paths[1])
     balance_img = ImageTk.PhotoImage(balance_img)
     balance_image.image = balance_img
     balance_image.configure(image=balance_img)
 
     # SCALE TAB
-    scale_1_img = Image.open(SCALE_1_PATH)
+    scale_1_img = Image.open(paths[2])
     scale_1_img = ImageTk.PhotoImage(scale_1_img)
     scale_1_image.image = scale_1_img
     scale_1_image.configure(image=scale_1_img)
 
-    scale_2_img = Image.open(SCALE_2_PATH)
+    scale_2_img = Image.open(paths[3])
     scale_2_img = ImageTk.PhotoImage(scale_2_img)
     scale_2_image.image = scale_2_img
     scale_2_image.configure(image=scale_2_img)
 
-    scale_3_img = Image.open(SCALE_3_PATH)
+    scale_3_img = Image.open(paths[4])
     scale_3_img = ImageTk.PhotoImage(scale_3_img)
     scale_3_image.image = scale_3_img
     scale_3_image.configure(image=scale_3_img)
 
     # COLOURBLIND TAB
-    loaded_original = Image.open(PATH).resize((250, 250))
+    loaded_original = Image.open(paths[0]).resize((250, 250))
     original = ImageTk.PhotoImage(loaded_original)
     original_image.image = original
     original_image.configure(image=original)
 
-    protan_img = Image.open(PROTAN_PATH)
+    protan_img = Image.open(paths[5])
     protan_img = ImageTk.PhotoImage(protan_img)
     protan_image.image = protan_img
     protan_image.configure(image=protan_img)
 
-    deutan_img = Image.open(DEUTAN_PATH)
+    deutan_img = Image.open(paths[6])
     deutan_img = ImageTk.PhotoImage(deutan_img)
     deutan_image.image = deutan_img
     deutan_image.configure(image=deutan_img)
 
-    tritan_img = Image.open(TRITAN_PATH)
+    tritan_img = Image.open(paths[7])
     tritan_img = ImageTk.PhotoImage(tritan_img)
     tritan_image.image = tritan_img
     tritan_image.configure(image=tritan_img)
 
     # BLUR TAB
-    blur_img = Image.open(BLUR_PATH)
+    blur_img = Image.open(paths[8])
     blur_img = ImageTk.PhotoImage(blur_img)
     blur_image.image = blur_img
     blur_image.configure(image=blur_img)
 
     # PIXELATE TAB
-    pixel_img = Image.open(PIXEL_PATH)
+    pixel_img = Image.open(paths[9])
     pixel_img = ImageTk.PhotoImage(pixel_img)
     pixel_image.image = pixel_img
     pixel_image.configure(image=pixel_img)
 
     # BLACK AND WHITE TAB
-    grayscale_img = Image.open(GRAYSCALE_PATH)
+    grayscale_img = Image.open(paths[10])
     grayscale_img = ImageTk.PhotoImage(grayscale_img)
     grayscale_image.image = grayscale_img
     grayscale_image.configure(image=grayscale_img)
 
     if tabs.index("current") == 0:
         tips.config(text="""Upload a file to get started. Please use images
-above 200x200 pixels and while not required, a white
-background works better to see the results.""")
+                            above 200x200 pixels and while not required, a white
+                            background works better to see the results.""")
     elif tabs.index("current") == 1:
         tips.config(text="""The balance of your logo can be important to make
-sure one side doesn't overwhelm the other.""")
+                            sure one side doesn't overwhelm the other.""")
     elif tabs.index("current") == 2:
         tips.config(text="""It's important for a logo to be recognisable from
-any size. If you can't see important details, the
-logo might need to be simplified more.""")
+                            any size. If you can't see important details, the
+                            logo might need to be simplified more.""")
     elif tabs.index("current") == 3:
         tips.config(text="""If colour is an important part of your design,
-it's important to take people with colourblindness into
-account. Do the colours still convey the right message?""")
+                            it's important to take people with colourblindness
+                            into account. Do the colours still convey the right
+                            message?""")
     elif tabs.index("current") == 4:
         tips.config(text="""A blurred image helps you imagine what your logo
-could look like at a quick glance, can people still tell
-what it is?""")
+                            could look like at a quick glance, can people still
+                            tell what it is?""")
     elif tabs.index("current") == 5:
         tips.config(text="""A logo will lose a lot of detail at lower
-resolutions. A good logo should still be recognisable with
-the lost detail.""")
+                            resolutions. A good logo should still be
+                            recognisable with the lost detail.""")
     else:
         tips.config(text="""A good logo works with both colour and in black and
-white""")
+                            white""")
 
     root.after(1, main_loop)
 
@@ -216,18 +217,21 @@ white""")
 root = Tk()
 
 ICON = ImageTk.PhotoImage(Image.open("./Assets/icon.png"))
-PATH = "./Temporary/resized.png"
-BALANCE_PATH = "./Temporary/balanced.png"
-SCALE_1_PATH = "./Temporary/scale_1.png"
-SCALE_2_PATH = "./Temporary/scale_2.png"
-SCALE_3_PATH = "./Temporary/scale_3.png"
-PROTAN_PATH = "./Temporary/protan.png"
-DEUTAN_PATH = "./Temporary/deutan.png"
-TRITAN_PATH = "./Temporary/tritan.png"
-BLUR_PATH = "./Temporary/blurred.png"
-PIXEL_PATH = "./Temporary/pixelated.png"
-SILHOUETTE_PATH = "./Temporary/silhouette.png"
-GRAYSCALE_PATH = "./Temporary/grayscale.png"
+os.mkdir("./Temporary/")
+
+paths = [
+    "./Temporary/resized.png",
+    "./Temporary/balanced.png",
+    "./Temporary/scale_1.png",
+    "./Temporary/scale_2.png",
+    "./Temporary/scale_3.png",
+    "./Temporary/protan.png",
+    "./Temporary/deutan.png",
+    "./Temporary/tritan.png",
+    "./Temporary/blurred.png",
+    "./Temporary/pixelated.png",
+    "./Temporary/grayscale.png"
+]
 
 make_files("./Assets/icon.png")
 

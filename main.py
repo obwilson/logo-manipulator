@@ -65,8 +65,13 @@ def balance():
 def colourblind():
     """Converts image to 3 different types of colourblindness"""
 
+    overlay = Image.open("./Assets/original_overlay.png").convert("RGBA")
+    protan_overlay = Image.open("./Assets/protan_overlay.png").convert("RGBA")
+    deutan_overlay = Image.open("./Assets/deutan_overlay.png").convert("RGBA")
+    tritan_overlay = Image.open("./Assets/tritan_overlay.png").convert("RGBA")
+
     file = np.asarray(
-    Image.open("./Temporary/resized.png").resize((250, 250)).convert("RGB")
+    Image.open(paths[0]).resize((250, 250)).convert("RGB")
     )
 
     sim = simulate.Simulator_Brettel1997()
@@ -77,10 +82,17 @@ def colourblind():
     tritan_img = sim.simulate_cvd (file, simulate.Deficiency.TRITAN,
                                    severity=1)
 
-    protan = Image.fromarray(protan_img)
-    deutan = Image.fromarray(deutan_img)
-    tritan = Image.fromarray(tritan_img)
+    original_cb = Image.open(paths[0]).resize((250, 250)).convert("RGBA")
+    protan = Image.fromarray(protan_img).convert("RGBA")
+    deutan = Image.fromarray(deutan_img).convert("RGBA")
+    tritan = Image.fromarray(tritan_img).convert("RGBA")
 
+    original_cb.paste(overlay, (0, 0), overlay)
+    protan.paste(protan_overlay, (0, 0), protan_overlay)
+    deutan.paste(deutan_overlay, (0, 0), deutan_overlay)
+    tritan.paste(tritan_overlay, (0, 0), tritan_overlay)
+
+    original_cb.save("./Temporary/original_cb.png")
     protan.save("./Temporary/protan.png")
     deutan.save("./Temporary/deutan.png")
     tritan.save("./Temporary/tritan.png")
@@ -217,8 +229,6 @@ def main_loop():
 root = Tk()
 
 ICON = ImageTk.PhotoImage(Image.open("./Assets/icon.png"))
-os.mkdir("./Temporary/")
-
 paths = [
     "./Temporary/resized.png",
     "./Temporary/balanced.png",

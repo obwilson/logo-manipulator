@@ -157,10 +157,6 @@ def main_loop():
     scale_3_image.configure(image=scale_3_img)
 
     # COLOURBLIND TAB
-    loaded_original = Image.open(paths[0]).resize((250, 250))
-    original = ImageTk.PhotoImage(loaded_original)
-    original_image.image = original
-    original_image.configure(image=original)
 
     protan_img = Image.open(paths[5])
     protan_img = ImageTk.PhotoImage(protan_img)
@@ -176,21 +172,26 @@ def main_loop():
     tritan_img = ImageTk.PhotoImage(tritan_img)
     tritan_image.image = tritan_img
     tritan_image.configure(image=tritan_img)
+    
+    loaded_original = Image.open(paths[8]).resize((250, 250))
+    original = ImageTk.PhotoImage(loaded_original)
+    original_image.image = original
+    original_image.configure(image=original)
 
     # BLUR TAB
-    blur_img = Image.open(paths[8])
+    blur_img = Image.open(paths[9])
     blur_img = ImageTk.PhotoImage(blur_img)
     blur_image.image = blur_img
     blur_image.configure(image=blur_img)
 
     # PIXELATE TAB
-    pixel_img = Image.open(paths[9])
+    pixel_img = Image.open(paths[10])
     pixel_img = ImageTk.PhotoImage(pixel_img)
     pixel_image.image = pixel_img
     pixel_image.configure(image=pixel_img)
 
     # BLACK AND WHITE TAB
-    grayscale_img = Image.open(paths[10])
+    grayscale_img = Image.open(paths[11])
     grayscale_img = ImageTk.PhotoImage(grayscale_img)
     grayscale_image.image = grayscale_img
     grayscale_image.configure(image=grayscale_img)
@@ -238,6 +239,7 @@ paths = [
     "./Temporary/protan.png",
     "./Temporary/deutan.png",
     "./Temporary/tritan.png",
+    "./Temporary/original_cb.png",
     "./Temporary/blurred.png",
     "./Temporary/pixelated.png",
     "./Temporary/grayscale.png"
